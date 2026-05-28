@@ -32,8 +32,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initRemote() {
+    console.log("Tentative de connexion au serveur...");
     socket = new WebSocket('wss://karting-a-gogo-server.onrender.com');
-    socket.onclose = () => setTimeout(initRemote, 2000);
+
+    // Quand la connexion réussit :
+    socket.onopen = () => {
+        console.log("✅ Manette connectée avec succès au serveur !");
+    };
+
+    // Si le serveur est endormi ou crash :
+    socket.onerror = (error) => {
+        console.error("❌ Erreur de connexion :", error);
+    };
+
+    // Quand ça coupe (ou pendant que Render se réveille) :
+    socket.onclose = () => {
+        console.log("⚠️ Déconnecté. Nouvelle tentative dans 2 secondes...");
+        setTimeout(initRemote, 2000);
+    };
 }
 initRemote();
 
